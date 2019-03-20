@@ -7,6 +7,7 @@ const db             = require('./config/db');
 const port = 8000;
 
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 app.use(function (req, res, next) {
 
