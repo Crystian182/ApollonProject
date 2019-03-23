@@ -52,21 +52,22 @@ module.exports = function(app, db) {
       });
     });
 
-      app.put('/measures/:id', (req, res) => {
-        const id = req.params.id;
-        const details = { '_id': new ObjectID(id) };
-        const measure = {
-          value: req.body.value,
-          lat: req.body.lat,
-          lng: req.body.lng,
-          date: new Date()
-        };
-        db.collection('measures').update(details, measure, (err, result) => {
-          if (err) {
-              res.send({'error':'An error has occurred'});
-          } else {
-              res.send(note);
-          } 
-        });
+    app.put('/measures/:id', (req, res) => {
+      const id = req.params.id;
+      const details = { '_id': new ObjectID(id) };
+      const measure = {
+        value: req.body.value,
+        lat: req.body.lat,
+        lng: req.body.lng,
+        date: new Date()
+      };
+      db.collection('measures').update(details, measure, (err, result) => {
+        if (err) {
+            res.send({'error':'An error has occurred'});
+        } else {
+            res.send(note);
+        } 
       });
+    });
+
   };
