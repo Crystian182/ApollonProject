@@ -1,20 +1,14 @@
-module.exports = function(app, db) {
+module.exports = function(app) {
 
-    var db = require('../../config/mysqldb');
-    var mysql = require('mysql');
-  
-    app.get('/users/:id', function (req, res) {
-        return getUserById(req.params.id).then(function (r) {
-            return res.send(r);
-        });
+    var pool = require('../../config/mysqldb')
+
+    app.get('/users/:id', async function (req, res) {
+        try {
+            var result = await pool.query('SELECT * FROM users WHERE id = ?', req.params.id)
+            res.send(result)
+        } catch(err) {
+            throw new Error(err)
+        }
     });
-
-    var getUserById = function(id) {
-        var params = [id];
-        var query = 'SELECT * FROM users WHERE id = ? LIMIT 1;';
-        return db.query(mysql.format(query, params)).then(function (r) {
-            return r;
-        });
-    }
 
 }

@@ -1,11 +1,11 @@
-module.exports = function(app, db) {
+module.exports = function(app, mongodb) {
 
     var ObjectID = require('mongodb').ObjectID;
 
     app.get('/measures/:id', (req, res) => {
       const id = req.params.id;
       const details = { '_id': new ObjectID(id) };
-      db.collection('measures').findOne(details, (err, item) => {
+      mongodb.collection('measures').findOne(details, (err, item) => {
         if (err) {
           res.send({'error':'An error has occurred'});
         } else {
@@ -15,7 +15,7 @@ module.exports = function(app, db) {
     });
 
     app.get('/measures', (req, res) => {
-      db.collection('measures').find({}).toArray(function (err, result) {
+      mongodb.collection('measures').find({}).toArray(function (err, result) {
         if (err) {
             res.send(err);
         } else {
@@ -31,7 +31,7 @@ module.exports = function(app, db) {
         lng: req.body.lng,
         date: new Date()
       };
-      db.collection('measures').insert(measure, (err, result) => {
+      mongodb.collection('measures').insert(measure, (err, result) => {
         if (err) { 
           res.send({ 'error': 'An error has occurred' }); 
         } else {
@@ -43,7 +43,7 @@ module.exports = function(app, db) {
     app.delete('/measures/:id', (req, res) => {
       const id = req.params.id;
       const details = { '_id': new ObjectID(id) };
-      db.collection('measures').remove(details, (err, item) => {
+      mongodb.collection('measures').remove(details, (err, item) => {
         if (err) {
           res.send({'error':'An error has occurred'});
         } else {
@@ -61,7 +61,7 @@ module.exports = function(app, db) {
         lng: req.body.lng,
         date: new Date()
       };
-      db.collection('measures').update(details, measure, (err, result) => {
+      mongodb.collection('measures').update(details, measure, (err, result) => {
         if (err) {
             res.send({'error':'An error has occurred'});
         } else {

@@ -1,29 +1,33 @@
-var mysql = require('mysql');
-var Promise = require('bluebird');
-var using = Promise.using;
-Promise.promisifyAll(require('mysql/lib/Connection').prototype);
-Promise.promisifyAll(require('mysql/lib/Pool').prototype);
-
-var pool = mysql.createPool({
+const util = require('util')
+const mysql = require('mysql')
+const pool = mysql.createPool({
+    connectionLimit: 10,
     host: 'localhost',
-    port: '3306',
     user: 'root',
     password: 'root',
     database: 'mydb'
-});
+})
 
-var getConnection = function () {
-    return pool.getConnectionAsync().disposer(function (connection) {
-    return connection.destroy();
-    });
-   };
+// Ping database to check for common exception errors.
+pool.getConnection((err, connection) => {
+    if (err) {
+        if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+            console.error('Database connection was closed.')
+        }
+        if (err.code === 'ER_CON_COUNT_ERROR') {
+            console.error('Database has too many connections.')
+        }
+        if (err.code === 'ECONNREFUSED') {
+            console.error('Database connection was refused.')
+        }
+    }
 
-var query = function (command) {
-    return using(getConnection(), function (connection) {
-    return connection.queryAsync(command);
-    });
-};
+    if (connection) connection.release()
 
-module.exports = {
-    query: query
-};
+    return
+})
+
+// Promisify for Node.js async/await.
+pool.query = util.promisify(pool.query)
+
+module.exports = pool

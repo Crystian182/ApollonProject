@@ -2,7 +2,7 @@ const express        = require('express');
 const MongoClient    = require('mongodb').MongoClient;
 const bodyParser     = require('body-parser');
 const app            = express();
-const db             = require('./config/db');
+const mongodb        = require('./config/db');
 
 const port = 8000;
 
@@ -28,7 +28,7 @@ app.use(function (req, res, next) {
   next();
 });
 
-MongoClient.connect(db.url, (err, database) => {
+MongoClient.connect(mongodb.url, (err, database) => {
     if (err) return console.log(err)
                         
     require('./app/routes')(app, database.db("apollonproject"));
