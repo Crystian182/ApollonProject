@@ -5,7 +5,11 @@ const pool = mysql.createPool({
     host: 'localhost',
     user: 'root',
     password: 'root',
-    database: 'mydb'
+    database: 'crudb',
+    dateStrings: [
+        'DATE',
+        'DATETIME'
+    ]
 })
 
 // Ping database to check for common exception errors.
