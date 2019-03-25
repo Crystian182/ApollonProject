@@ -46,8 +46,9 @@ module.exports = function(app) {
 
     app.delete('/persona/:idpersona', async function (req, res) {
         try {
-            var result = await pool.query('DELETE FROM persona WHERE idpersona=?', req.params.idpersona)
-            res.send(result)
+            var result1 = await pool.query('DELETE FROM recapito WHERE persona_idpersona=?', req.params.idpersona)
+            var result2 = await pool.query('DELETE FROM persona WHERE idpersona=?', req.params.idpersona)
+            res.send(result2)
         } catch(err) {
             res.status(500).send();
             throw new Error(err)
