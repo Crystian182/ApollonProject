@@ -25,12 +25,14 @@ module.exports = function(app, mongodb) {
     });
 
     app.post('/measures', (req, res) => {
-      const measure = {
+      const measure = new ObjectModel({
         value: req.body.value,
         lat: req.body.lat,
         lng: req.body.lng,
         date: new Date()
-      };
+      });
+    /*  db.collection('measures').insert(measure, (err, result) => {
+      };*/
       mongodb.collection('measures').insert(measure, (err, result) => {
         if (err) { 
           res.send({ 'error': 'An error has occurred' }); 
