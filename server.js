@@ -3,13 +3,16 @@ const MongoClient    = require('mongodb').MongoClient;
 const bodyParser     = require('body-parser');
 const app            = express();
 const mongodb        = require('./config/db');
+const cors           = require('cors')
 
 const port = 8000;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-app.use(function (req, res, next) {
+app.use(cors())
+
+/*app.use(function (req, res, next) {
 
   // Website you wish to allow to connect
   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
@@ -26,7 +29,7 @@ app.use(function (req, res, next) {
 
   // Pass to next layer of middleware
   next();
-});
+});*/
 
 MongoClient.connect(mongodb.url, (err, database) => {
     if (err) return console.log(err)
