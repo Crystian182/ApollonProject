@@ -17,7 +17,7 @@ module.exports = function(app) {
     app.get('/recapito', async function (req, res) {
         try {
             var result = await pool.query('SELECT * FROM recapito')
-            var i = 0;
+            var i;
             for(i = 0; i<result.length; i++) {
                 var persona = await pool.query('SELECT * FROM persona WHERE idpersona = ?', result[i].persona_idpersona)
                 result[i].persona = persona[0]
