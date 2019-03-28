@@ -26,7 +26,10 @@ pool.getConnection((err, connection) => {
         }
     }
 
-    if (connection) connection.release()
+    if (connection){
+        console.log('MySqlDB live on port 3306')
+        connection.release()
+    }
 
     return
 })
