@@ -15,6 +15,11 @@ module.exports = function(app) {
     app.get('/persona', async function (req, res) {
         try {
             var result = await pool.query('SELECT * FROM persona')
+            var i;
+            for(i=0; i<result.length; i++) {
+                var recapiti = await pool.query('SELECT * FROM recapito WHERE persona_idpersona = ?', result[i].idpersona);
+                result[i].recapiti = recapiti
+            }
             res.send(result)
         } catch(err) {
             res.status(500).send();

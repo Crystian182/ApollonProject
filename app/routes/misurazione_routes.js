@@ -14,7 +14,7 @@ module.exports = function(app, mongodb) {
         for(i=0; i<misurazioni.length; i++) {
           const details = { '_id': new ObjectID(misurazioni[i].idcentralina) };
           const centralina = await mongodb.collection('centraline').findOne(details)
-          var misurazione = {id: misurazioni[i]._id,
+          var misurazione = {_id: misurazioni[i]._id,
                             valore: misurazioni[i].valore,
                             data: misurazioni[i].data,
                             centralina: centralina}
@@ -62,7 +62,7 @@ module.exports = function(app, mongodb) {
         valore: req.body.valore,
         idcentralina: req.body.centralina._id
       };
-      const details = { '_id': new ObjectID(req.body.id) };
+      const details = { '_id': new ObjectID(req.body._id) };
       try {
         const result = await mongodb.collection('misurazioni').update(details, { $set: misurazione})
         res.send(result)
