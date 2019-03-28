@@ -1,10 +1,12 @@
-const measureRoutes = require('./measure_routes');
+const misurazioneRoutes = require('./misurazione_routes');
 const userRoutes = require('./user_routes');
 const personaRoutes = require('./persona_routes');
 const recapitoRoutes = require('./recapito_routes');
+const centralinaRoutes = require('./centralina_routes');
 
 module.exports = function(app, mongodb) {
-  measureRoutes(app, mongodb);
+  misurazioneRoutes(app, mongodb);
+  centralinaRoutes(app, mongodb);
   userRoutes(app);
   personaRoutes(app);
   recapitoRoutes(app);

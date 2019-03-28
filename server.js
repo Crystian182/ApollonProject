@@ -5,6 +5,7 @@ const app            = express();
 const mongodb        = require('./config/db');
 const cors           = require('cors')
 
+
 const port = 8000;
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -39,3 +40,5 @@ MongoClient.connect(mongodb.url, (err, database) => {
       console.log('We are live on ' + port);
     });               
   })
+
+  
