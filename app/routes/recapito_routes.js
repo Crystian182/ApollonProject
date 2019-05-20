@@ -17,8 +17,7 @@ module.exports = function(app) {
     app.get('/recapito', async function (req, res) {
         try {
             var result = await pool.query('SELECT * FROM recapito')
-            var i;
-            for(i = 0; i<result.length; i++) {
+            for(var i = 0; i<result.length; i++) {
                 var persona = await pool.query('SELECT * FROM persona WHERE idpersona = ?', result[i].persona_idpersona)
                 result[i].persona = persona[0]
             }
@@ -54,7 +53,7 @@ module.exports = function(app) {
 
     app.put('/recapito', async function (req, res) {
         try {
-            var result = await pool.query('UPDATE recapito SET numero=? WHERE idrecapito=?', [req.body.numero, req.body.idrecapito])
+            await pool.query('UPDATE recapito SET numero=? WHERE idrecapito=?', [req.body.numero, req.body.idrecapito])
             var recapito = await pool.query('SELECT * FROM recapito WHERE idrecapito = ?', req.body.idrecapito)
             var persona = await pool.query('SELECT * FROM persona WHERE idpersona = ?', recapito[0].persona_idpersona)
             recapito[0].persona = persona[0]

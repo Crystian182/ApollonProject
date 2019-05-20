@@ -38,8 +38,8 @@ module.exports = function(app, mongodb) {
       const id = req.params.id;
       const details = { '_id': new ObjectID(id) };
       try {
-        const deleteAllMis = await mongodb.collection('misurazioni').remove({ 'idcentralina': id })
-        const result = await mongodb.collection('centraline').remove(details)
+        await mongodb.collection('misurazioni').remove({ 'idcentralina': id })
+        await mongodb.collection('centraline').remove(details)
         res.send().status(200)
       } catch (err) {
         res.status(500).send();

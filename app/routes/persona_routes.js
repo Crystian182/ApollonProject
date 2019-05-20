@@ -15,8 +15,7 @@ module.exports = function(app) {
     app.get('/persona', async function (req, res) {
         try {
             var result = await pool.query('SELECT * FROM persona')
-            var i;
-            for(i=0; i<result.length; i++) {
+            for(var i=0; i<result.length; i++) {
                 var recapiti = await pool.query('SELECT * FROM recapito WHERE persona_idpersona = ?', result[i].idpersona);
                 result[i].recapiti = recapiti
             }
@@ -31,8 +30,7 @@ module.exports = function(app) {
         try {
             var result = await pool.query('INSERT INTO persona (nome, cognome, data_nascita) VALUES (?,?,?)', [req.body.nome, req.body.cognome, req.body.data_nascita])
             if(req.body.recapiti.length != 0) {
-                var i;
-                for(i = 0; i<req.body.recapiti.length; i++) {
+                for(var i = 0; i<req.body.recapiti.length; i++) {
                     await pool.query('INSERT INTO recapito (numero, persona_idpersona) VALUES (?,?)', [req.body.recapiti[i].numero, result.insertId])
                 }
             }
@@ -53,8 +51,7 @@ module.exports = function(app) {
                 await pool.query('DELETE FROM recapito WHERE persona_idpersona=?', req.body.idpersona)
             } else {
                 var ids = [];
-                var i;
-                for(i = 0; i<req.body.recapiti.length; i++) {
+                for(var i = 0; i<req.body.recapiti.length; i++) {
                     if(req.body.recapiti[i].idrecapito != undefined) {
                         await pool.query('UPDATE recapito SET numero=? WHERE idrecapito=?', [req.body.recapiti[i].numero, req.body.recapiti[i].idrecapito])
                         ids.push(req.body.recapiti[i].idrecapito)
@@ -75,9 +72,9 @@ module.exports = function(app) {
 
     app.delete('/persona/:idpersona', async function (req, res) {
         try {
-            var result1 = await pool.query('DELETE FROM recapito WHERE persona_idpersona=?', req.params.idpersona)
-            var result2 = await pool.query('DELETE FROM persona WHERE idpersona=?', req.params.idpersona)
-            res.send(result2)
+            await pool.query('DELETE FROM recapito WHERE persona_idpersona=?', req.params.idpersona)
+            await pool.query('DELETE FROM persona WHERE idpersona=?', req.params.idpersona)
+            res.send().status(200);
         } catch(err) {
             res.status(500).send();
             throw new Error(err)
