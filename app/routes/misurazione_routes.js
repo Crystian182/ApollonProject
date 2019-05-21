@@ -63,6 +63,50 @@ module.exports = function(app, mongodb) {
   })
 );
 
+app.get('/misurazioni/efmedium', asyncMiddleware(async (req, res, next) => {
+  try {
+    var medium = await mongodb.collection('misurazioni').aggregate([{$group:{_id: "$phoneInfo.imei",avgEM: { $avg: "$emMeasure.value" }}}]).toArray()
+    var totalUsers = medium.length
+    var low = 0; //<=43
+    var med = 0; //>43 e <=46
+    var high = 0; //>46
+
+    for(let m of medium) {
+      if(m.avgEM <= 43) {
+        low = low + 1
+      } else if(m.avgEM > 43 && m.avgEM <= 46) {
+        med = med + 1
+      } else if(m.avgEM > 46) {
+        high = high + 1
+      }
+    }
+    
+    //low:total=x:100
+    var percLow = (low*100)/totalUsers
+    var percMed = (med*100)/totalUsers
+    var percHigh = (high*100)/totalUsers
+
+    res.send([{label: 'Basso', percentage: percLow},
+              {label: 'Medio', percentage: percMed},
+              {label: 'Alto', percentage: percHigh}]);
+  } catch (err) {
+    res.status(500).send();
+    throw new Error(err)
+  }
+})
+);
+
+app.get('/misurazioni/carriermedium', asyncMiddleware(async (req, res, next) => {
+  try {
+    var medium = await mongodb.collection('misurazioni').aggregate([{$group:{_id: "$simInfo.carrier", avgdbm: { $avg: "$networkMeasure.measure.value" }}}]).toArray()
+    res.send(medium);
+  } catch (err) {
+    res.status(500).send();
+    throw new Error(err)
+  }
+})
+);
+
 function getWeight(value) {
   if(value <= -110)
     return 0.15;
