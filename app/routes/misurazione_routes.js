@@ -4,7 +4,6 @@ module.exports = function(app, mongodb) {
   var pool = require('../../config/mysqldb')
 
 
-  var moment = require('moment');
 
   const asyncMiddleware = fn => (req, res, next) => {
     Promise.resolve(fn(req, res, next))
