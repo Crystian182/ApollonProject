@@ -4,6 +4,8 @@ module.exports = function(app, mongodb) {
   var pool = require('../../config/mysqldb')
 
 
+  var moment = require('moment');
+
   const asyncMiddleware = fn => (req, res, next) => {
     Promise.resolve(fn(req, res, next))
       .catch(next);
@@ -104,8 +106,42 @@ app.get('/misurazioni/efmedium', asyncMiddleware(async (req, res, next) => {
     res.status(500).send();
     throw new Error(err)
   }
-})
-);
+}));
+
+app.get('/misurazioni/daychanges', asyncMiddleware(async (req, res, next) => {
+  try {
+    //var measures = await mongodb.collection('misurazioni').find({$and: [{$or: [{"gpsMeasure.lat.value": {$gt: 40.357037-0.02}},{"gpsMeasure.lat.value": {$lt: 40.357037+0.02}}]},{$or: [{"gpsMeasure.lng.value": {$gt: 18.171848-0.02}},{"gpsMeasure.lng.value": {$lt: 18.171848+0.02}}]}]}).toArray()
+
+    res.send([
+              {hour: 1, level: -111},
+              {hour: 2, level: -112},
+              {hour: 3, level: -113},
+              {hour: 4, level: -114},
+              {hour: 5, level: -115},
+              {hour: 6, level: -116},
+              {hour: 7, level: -100},
+              {hour: 8, level: -95},
+              {hour: 9, level: -97},
+              {hour: 10, level: -98},
+              {hour: 11, level: -94},
+              {hour: 12, level: -90},
+              {hour: 13, level: -93},
+              {hour: 14, level: -87},
+              {hour: 15, level: -80},
+              {hour: 16, level: -85},
+              {hour: 17, level: -90},
+              {hour: 18, level: -82},
+              {hour: 19, level: -75},
+              {hour: 20, level: -90},
+              {hour: 21, level: -95},
+              {hour: 22, level: -100},
+              {hour: 23, level: -112}
+    ]);
+  } catch (err) {
+    res.status(500).send();
+    throw new Error(err)
+  }
+}));
 
 app.get('/misurazioni/carriermedium', asyncMiddleware(async (req, res, next) => {
   try {
@@ -135,6 +171,13 @@ function getWeight(value) {
 
   app.post('/misurazioni', asyncMiddleware(async (req, res, next) => {
     try {
+      var timestampReport = new Date(req.body.timestamp)
+      var timestampGPS = new Date(req.body.gpsMeasure.timestamp)
+      var userTimezoneOffset = timestampReport.getTimezoneOffset() * 60000;
+
+      req.body.timestamp = new Date(timestampReport.getTime() - userTimezoneOffset);
+      req.body.gpsMeasure.timestamp = new Date(timestampGPS.getTime() - userTimezoneOffset);
+
       const result = await mongodb.collection('misurazioni').insert(req.body);
       res.send(result)
     } catch(err) {
