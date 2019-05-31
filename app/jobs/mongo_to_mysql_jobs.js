@@ -29,12 +29,45 @@ module.exports = function(mongodb) {
             console.log(misurazioni.length)
             if(misurazioni.length != 0) {
                 for(let m of misurazioni) {
+                    var persona = await pool.query('SELECT * FROM persona WHERE persona.email=?', m.userID);
+
+                    /************** PERSONA ***************/
                     var smartphone = await pool.query('SELECT * FROM smartphone WHERE smartphone.imei=?', m.phoneInfo.imei);
 
                     if(smartphone.length == 0) { //smartphone non esiste
-                        //prendere email persona e inserire smartphone
+                        var manufacturer = await pool.query('SELECT * FROM produttore WHERE nome=?', [m.phoneInfo.manufacturer])
+                        if(manufacturer.length == 0) { //produttore non esiste
+                            var manufacturer = await pool.query('INSERT INTO produttore (nome) VALUES (?)', [m.phoneInfo.manufacturer])
+                            var model = await pool.query('INSERT INTO modello (nome, produttore_idproduttore) VALUES (?,?)', [m.phoneInfo.model, manufacturer.insertId])
+                            var smartphone = await pool.query('INSERT INTO smartphone (imei, modello_idmodello) VALUES (?,?)', [m.phoneInfo.imei, model.insertId])
+                            var owner = await pool.query('INSERT INTO persona_has_smartphone (persona_idpersona, smartphone_idsmartphone) VALUES (?,?)', [persona[0].idpersona, smartphone.insertId])
+                        } else { //produttore esiste
+                            var model = await pool.query('SELECT * FROM modello WHERE nome=? AND produttore_idproduttore=?', [m.phoneInfo.model, manufacturer[0].idproduttore])
+
+                            if(model.length == 0) { //modello non esiste
+                                var model = await pool.query('INSERT INTO modello (nome, produttore_idproduttore) VALUES (?,?)', [m.phoneInfo.model, manufacturer[0].idproduttore])
+                                var smartphone = await pool.query('INSERT INTO smartphone (imei, modello_idmodello) VALUES (?,?)', [m.phoneInfo.imei, model.insertId])
+                                var owner = await pool.query('INSERT INTO persona_has_smartphone (persona_idpersona, smartphone_idsmartphone) VALUES (?,?)', [persona[0].idpersona, smartphone.insertId])
+                            } else { //modello esiste
+                                var smartphone = await pool.query('SELECT * FROM smartphone WHERE imei=? AND modello_idmodello=?', [m.phoneInfo.imei, model[0].idmodello])
+
+                                if(smartphone.length == 0) { //smartphone non esiste
+                                    var smartphone = await pool.query('INSERT INTO smartphone (imei, modello_idmodello) VALUES (?,?)', [m.phoneInfo.imei, model[0].idmodello])
+                                    var owner = await pool.query('INSERT INTO persona_has_smartphone (persona_idpersona, smartphone_idsmartphone) VALUES (?,?)', [persona[0].idpersona, smartphone.insertId])
+                                } else { //smartphone esiste
+                                    var owner = await pool.query('INSERT INTO persona_has_smartphone (persona_idpersona, smartphone_idsmartphone) VALUES (?,?)', [persona[0].idpersona, smartphone[0].idsmartphone])
+                                }
+                            }
+                        }
                         var smartphone = await pool.query('SELECT * FROM smartphone WHERE smartphone.imei=?', m.phoneInfo.imei);
-                    } 
+                    } else {
+                        var owner = await pool.query('SELECT * FROM persona_has_smartphone WHERE persona_idpersona=? AND smartphone_idsmartphone=?', [persona[0].idpersona, smartphone[0].idsmartphone])
+                        
+                        if(owner.length == 0) { //questa persona non possiede lo smartphone
+                            var owner = await pool.query('INSERT INTO persona_has_smartphone (persona_idpersona, smartphone_idsmartphone) VALUES (?,?)', [persona[0].idpersona, smartphone[0].idsmartphone])
+                        }
+                    }
+                    /**************************************/
 
                     /**************** GPS *****************/
                     var gps =  await pool.query('SELECT * FROM misurazione_gps WHERE latitudine=? AND longitudine=?',[m.gpsMeasure.lat.value,  m.gpsMeasure.lng.value])
@@ -44,7 +77,7 @@ module.exports = function(mongodb) {
                     }
                     /**************************************/
                     
-                    var report = await pool.query('INSERT INTO report (data_report, data_localizzazione, smartphone_idsmartphone, misurazione_gps_idmisurazione_gps) VALUES(?,?,?,?)', [getSQLDate(m.timestamp), getSQLDate(m.gpsMeasure.timestamp), smartphone[0].idsmartphone, gps[0].idmisurazione_gps])
+                    var report = await pool.query('INSERT INTO report (data_report, data_localizzazione, smartphone_idsmartphone, persona_idpersona, misurazione_gps_idmisurazione_gps) VALUES(?,?,?,?,?)', [getSQLDate(m.timestamp), getSQLDate(m.gpsMeasure.timestamp), smartphone[0].idsmartphone, persona[0].idpersona, gps[0].idmisurazione_gps])
 
                     /********** CAMPO MAGNETICO  **********/
                     var unit_measure_em = await pool.query('SELECT * FROM unita_misura WHERE unita_misura.nome=?', m.emMeasure.unitMeasurement.name)
