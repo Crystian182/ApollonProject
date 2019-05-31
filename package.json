@@ -16,9 +16,11 @@
     "body-parser": "^1.18.3",
     "cors": "^2.8.5",
     "express": "^4.16.4",
+    "moment": "^2.24.0",
     "mongodb": "^2.2.16",
     "mongodb-bluebird": "^0.1.2",
-    "mysql": "^2.16.0"
+    "mysql": "^2.16.0",
+    "node-cron": "^2.0.3"
   },
   "devDependencies": {
     "nodemon": "^1.18.10"
