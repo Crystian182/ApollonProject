@@ -15,9 +15,11 @@ MongoClient.connect(url, (err, database) => {
   if (err) return console.log(err)
                       
   require('./app/routes')(app, database.db("apollonproject"));
+  require('./cron')(database.db("apollonproject"));
   app.listen(port, () => {
     console.log('MongoDB live on port ' + port);
   });               
 })
+
 
   
