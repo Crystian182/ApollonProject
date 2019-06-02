@@ -93,6 +93,16 @@ module.exports = function(app, mongodb) {
     }
   });
 
+  app.get('/misurazioni/gethourofday/year=:year&month=:month&day=:day', async function (req, res) {
+    try {
+      var ore = await pool.query('SELECT SUBSTRING(data, 12) AS ora FROM media_ora_zoom1 WHERE SUBSTRING(data, 1, 10) = \'' + req.params.year + '-' + req.params.month + '-' + req.params.day + '\';');
+      res.send(ore);
+    } catch (err) {
+      res.status(500).send();
+      throw new Error(err)
+    }
+  });
+
   app.get('/misurazioni', asyncMiddleware(async (req, res, next) => {
     try {
       var networkMeasure = [];
