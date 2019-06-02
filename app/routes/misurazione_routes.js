@@ -103,6 +103,25 @@ module.exports = function(app, mongodb) {
     }
   });
 
+  app.get('/misurazioni/media/mese/from=:start&to=:end&zoom=:zoom&lat1=:lat1&lat2=:lat2&long1=:long1&long2=:long2', async function (req, res) {
+    try {
+      var arr = await pool.query('SELECT latitudine, longitudine, weight, data FROM media_mese_zoom' + req.params.zoom + ' WHERE' +
+              ' latitudine>=' + req.params.lat2 + ' AND latitudine<=' + req.params.lat1 + ' AND longitudine>=' + req.params.long1 + ' AND longitudine<=' + req.params.long2 + ' AND ' +
+              'STR_TO_DATE(data, \'%Y-%m\')>=STR_TO_DATE(\'' + req.params.start + '\', \'%Y-%m\') AND STR_TO_DATE(data, \'%Y-%m\')<=STR_TO_DATE(\'' + req.params.end + '\', \'%Y-%m\')');
+      var sorted = {};
+      for( var i = 0, max = arr.length; i < max ; i++ ){
+        if( sorted[arr[i].data] == undefined ){
+          sorted[arr[i].data] = [];
+        }
+        sorted[arr[i].data].push(arr[i]);
+      }
+      res.send(sorted);
+    } catch (err) {
+      res.status(500).send();
+      throw new Error(err)
+    }
+  });
+
   app.get('/misurazioni', asyncMiddleware(async (req, res, next) => {
     try {
       var networkMeasure = [];
