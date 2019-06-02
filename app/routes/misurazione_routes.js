@@ -3,8 +3,6 @@ module.exports = function(app, mongodb) {
   var ObjectID = require('mongodb').ObjectID;
   var pool = require('../../config/mysqldb')
 
-
-
   const asyncMiddleware = fn => (req, res, next) => {
     Promise.resolve(fn(req, res, next))
       .catch(next);
@@ -54,7 +52,15 @@ module.exports = function(app, mongodb) {
   });
   task.start();*/
  
-  
+  app.get('/misurazioni/media', async function (req, res) {
+    try {
+      var misurazioni = await pool.query('SELECT latitudine, longitudine, weight FROM media_zoom4');
+      res.send(misurazioni);
+    } catch (err) {
+      res.status(500).send();
+      throw new Error(err)
+    }
+  });
 
   app.get('/misurazioni', asyncMiddleware(async (req, res, next) => {
     try {

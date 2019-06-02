@@ -4,28 +4,28 @@ module.exports = function(mongodb) {
 
     let countJob = new cron.CronJob({
         cronTime : '*/50 * * * * *',  // The time pattern when you want the job to start
-        onTick : runTask, // Task to run
+        onTick : dbTransfer, // Task to run
         start : true, // immediately starts the job.
     });
 
-    async function runTask(){
+    async function dbTransfer(){
         console.log("running task")
        
         try{
 
-            //var date = new Date();
+            var date = new Date();
             
             /* MOCK DATE */
-            var timestamp = new Date("2019-05-31T07:00:00.458Z")
-            var userTimezoneOffset = timestamp.getTimezoneOffset() * 60000;
-            var date = new Date(timestamp.getTime() - userTimezoneOffset);
+            //var timestamp = new Date("2019-05-31T07:00:00.458Z")
+            //var userTimezoneOffset = timestamp.getTimezoneOffset() * 60000;
+            //var date = new Date(timestamp.getTime() - userTimezoneOffset);
             /*************/
 
             var currentDate = getFormattedDate(date)
             var oneHourBackDate = getOneHourBackDate(date);
 
-            //const misurazioni = await mongodb.collection('misurazioni').find( { "timestamp": { $gte: oneHourBackDate, $lt: currentDate } }).toArray();
-            const misurazioni = await mongodb.collection('misurazioni').find().toArray();
+            const misurazioni = await mongodb.collection('misurazioni').find( { "timestamp": { $gte: oneHourBackDate, $lt: currentDate } }).toArray();
+            //const misurazioni = await mongodb.collection('misurazioni').find().toArray();
             console.log(misurazioni.length)
             if(misurazioni.length != 0) {
                 for(let m of misurazioni) {
