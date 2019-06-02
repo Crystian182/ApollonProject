@@ -103,11 +103,68 @@ module.exports = function(app, mongodb) {
     }
   });
 
+  app.get('/misurazioni/media/anno/from=:start&to=:end&zoom=:zoom&lat1=:lat1&lat2=:lat2&long1=:long1&long2=:long2', async function (req, res) {
+    try {
+      var arr = await pool.query('SELECT latitudine, longitudine, weight, data FROM media_anno_zoom' + req.params.zoom + ' WHERE' +
+              ' latitudine>=' + req.params.lat2 + ' AND latitudine<=' + req.params.lat1 + ' AND longitudine>=' + req.params.long1 + ' AND longitudine<=' + req.params.long2 + ' AND ' +
+              'STR_TO_DATE(data, \'%Y\')>=STR_TO_DATE(\'' + req.params.start + '\', \'%Y\') AND STR_TO_DATE(data, \'%Y\')<=STR_TO_DATE(\'' + req.params.end + '\', \'%Y\')');
+      var sorted = {};
+      for( var i = 0, max = arr.length; i < max ; i++ ){
+        if( sorted[arr[i].data] == undefined ){
+          sorted[arr[i].data] = [];
+        }
+        sorted[arr[i].data].push(arr[i]);
+      }
+      res.send(sorted);
+    } catch (err) {
+      res.status(500).send();
+      throw new Error(err)
+    }
+  });
+
   app.get('/misurazioni/media/mese/from=:start&to=:end&zoom=:zoom&lat1=:lat1&lat2=:lat2&long1=:long1&long2=:long2', async function (req, res) {
     try {
       var arr = await pool.query('SELECT latitudine, longitudine, weight, data FROM media_mese_zoom' + req.params.zoom + ' WHERE' +
               ' latitudine>=' + req.params.lat2 + ' AND latitudine<=' + req.params.lat1 + ' AND longitudine>=' + req.params.long1 + ' AND longitudine<=' + req.params.long2 + ' AND ' +
               'STR_TO_DATE(data, \'%Y-%m\')>=STR_TO_DATE(\'' + req.params.start + '\', \'%Y-%m\') AND STR_TO_DATE(data, \'%Y-%m\')<=STR_TO_DATE(\'' + req.params.end + '\', \'%Y-%m\')');
+      var sorted = {};
+      for( var i = 0, max = arr.length; i < max ; i++ ){
+        if( sorted[arr[i].data] == undefined ){
+          sorted[arr[i].data] = [];
+        }
+        sorted[arr[i].data].push(arr[i]);
+      }
+      res.send(sorted);
+    } catch (err) {
+      res.status(500).send();
+      throw new Error(err)
+    }
+  });
+
+  app.get('/misurazioni/media/giorno/from=:start&to=:end&zoom=:zoom&lat1=:lat1&lat2=:lat2&long1=:long1&long2=:long2', async function (req, res) {
+    try {
+      var arr = await pool.query('SELECT latitudine, longitudine, weight, data FROM media_giorno_zoom' + req.params.zoom + ' WHERE' +
+              ' latitudine>=' + req.params.lat2 + ' AND latitudine<=' + req.params.lat1 + ' AND longitudine>=' + req.params.long1 + ' AND longitudine<=' + req.params.long2 + ' AND ' +
+              'STR_TO_DATE(data, \'%Y-%m-%d\')>=STR_TO_DATE(\'' + req.params.start + '\', \'%Y-%m-%d\') AND STR_TO_DATE(data, \'%Y-%m-%d\')<=STR_TO_DATE(\'' + req.params.end + '\', \'%Y-%m-%d\')');
+      var sorted = {};
+      for( var i = 0, max = arr.length; i < max ; i++ ){
+        if( sorted[arr[i].data] == undefined ){
+          sorted[arr[i].data] = [];
+        }
+        sorted[arr[i].data].push(arr[i]);
+      }
+      res.send(sorted);
+    } catch (err) {
+      res.status(500).send();
+      throw new Error(err)
+    }
+  });
+
+  app.get('/misurazioni/media/ora/from=:start&to=:end&zoom=:zoom&lat1=:lat1&lat2=:lat2&long1=:long1&long2=:long2', async function (req, res) {
+    try {
+      var arr = await pool.query('SELECT latitudine, longitudine, weight, data FROM media_ora_zoom' + req.params.zoom + ' WHERE' +
+              ' latitudine>=' + req.params.lat2 + ' AND latitudine<=' + req.params.lat1 + ' AND longitudine>=' + req.params.long1 + ' AND longitudine<=' + req.params.long2 + ' AND ' +
+              'STR_TO_DATE(data, \'%Y-%m-%d %H:%i:%s\')>=STR_TO_DATE(\'' + req.params.start + '\', \'%Y-%m-%d %H:%i:%s\') AND STR_TO_DATE(data, \'%Y-%m-%d %H:%i:%s\')<=STR_TO_DATE(\'' + req.params.end + '\', \'%Y-%m-%d %H:%i:%s\')');
       var sorted = {};
       for( var i = 0, max = arr.length; i < max ; i++ ){
         if( sorted[arr[i].data] == undefined ){
