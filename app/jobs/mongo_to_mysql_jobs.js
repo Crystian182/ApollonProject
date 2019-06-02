@@ -3,7 +3,7 @@ module.exports = function(mongodb) {
     var pool = require('../../config/mysqldb');
 
     let countJob = new cron.CronJob({
-        cronTime : '*/50 * * * * *',  // The time pattern when you want the job to start
+        cronTime : '*/60 * * * * *',  // The time pattern when you want the job to start
         onTick : dbTransfer, // Task to run
         start : true, // immediately starts the job.
     });

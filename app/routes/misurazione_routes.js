@@ -52,10 +52,41 @@ module.exports = function(app, mongodb) {
   });
   task.start();*/
  
-  app.get('/misurazioni/media', async function (req, res) {
+  app.get('/misurazioni/media/zoom=:zoom&lat1=:lat1&lat2=:lat2&long1=:long1&long2=:long2', async function (req, res) {
     try {
-      var misurazioni = await pool.query('SELECT latitudine, longitudine, weight FROM media_zoom4');
+      var misurazioni = await pool.query('SELECT latitudine, longitudine, weight FROM media_zoom' + req.params.zoom + ' WHERE' +
+              ' latitudine>=' + req.params.lat2 + ' AND latitudine<=' + req.params.lat1 + ' AND longitudine>=' + req.params.long1 + ' AND longitudine<=' + req.params.long2);
       res.send(misurazioni);
+    } catch (err) {
+      res.status(500).send();
+      throw new Error(err)
+    }
+  });
+
+  app.get('/misurazioni/getyears', async function (req, res) {
+    try {
+      var anni = await pool.query('SELECT data AS anno FROM media_anno_zoom1;');
+      res.send(anni);
+    } catch (err) {
+      res.status(500).send();
+      throw new Error(err)
+    }
+  });
+
+  app.get('/misurazioni/getmonthofyear/:year', async function (req, res) {
+    try {
+      var mesi = await pool.query('SELECT SUBSTRING(data, 6, 8) AS mese FROM media_mese_zoom1 WHERE SUBSTRING(data, 1, 4) = ' + req.params.year + ';');
+      res.send(mesi);
+    } catch (err) {
+      res.status(500).send();
+      throw new Error(err)
+    }
+  });
+
+  app.get('/misurazioni/getdayofmonth/year=:year&month=:month', async function (req, res) {
+    try {
+      var giorni = await pool.query('SELECT SUBSTRING(data, 9, 10) AS giorno FROM media_giorno_zoom1 WHERE SUBSTRING(data, 1, 7) = \'' + req.params.year + '-' + req.params.month + '\';');
+      res.send(giorni);
     } catch (err) {
       res.status(500).send();
       throw new Error(err)
