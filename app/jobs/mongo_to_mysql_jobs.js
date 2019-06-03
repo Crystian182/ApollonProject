@@ -1,19 +1,21 @@
 module.exports = function(mongodb) {
     let cron = require('cron');
     var pool = require('../../config/mysqldb');
+    var go = true;
 
     let countJob = new cron.CronJob({
-        cronTime : '*/60 * * * * *',  // The time pattern when you want the job to start
+        cronTime : '*/300 * * * * *',  // The time pattern when you want the job to start
         onTick : dbTransfer, // Task to run
         start : true, // immediately starts the job.
     });
 
     async function dbTransfer(){
-        console.log("running task")
+        //console.log("running task")
        
         try{
-
+            let i = 0;
             var date = new Date();
+            
             
             /* MOCK DATE */
             //var timestamp = new Date("2019-05-31T07:00:00.458Z")
@@ -24,11 +26,15 @@ module.exports = function(mongodb) {
             var currentDate = getFormattedDate(date)
             var oneHourBackDate = getOneHourBackDate(date);
 
-            const misurazioni = await mongodb.collection('misurazioni').find( { "timestamp": { $gte: oneHourBackDate, $lt: currentDate } }).toArray();
+            //const misurazioni = await mongodb.collection('misurazioni').find( { "timestamp": { $gte: oneHourBackDate, $lt: currentDate } }).toArray();
             //const misurazioni = await mongodb.collection('misurazioni').find().toArray();
-            console.log(misurazioni.length)
-            if(misurazioni.length != 0) {
+            const misurazioni = [];
+            //console.log(misurazioni.length)
+            if(misurazioni.length != 0 && go) {
+                go=false;
                 for(let m of misurazioni) {
+                    console.log(i)
+                    i=i+1
                     var persona = await pool.query('SELECT * FROM persona WHERE persona.email=?', m.userID);
 
                     /************** PERSONA ***************/
@@ -170,7 +176,7 @@ module.exports = function(mongodb) {
             console.log(err)
         }
 
-            console.log("finish")
+            //console.log("finish")
     };
 
 
@@ -181,8 +187,14 @@ module.exports = function(mongodb) {
     }
 
     function getSQLDate(date) {
-        return getFormattedDate(date).toISOString().substring(0,10) + " " +
-            getFormattedDate(date).toISOString().substring(11,19);
+        /*console.log(date)
+        console.log(getFormattedDate(date).toISOString().substring(0,10) + " " +
+        getFormattedDate(date).toISOString().substring(11,19))*/
+        //console.log(date)
+        //console.log(date.toISOString().substring(0, date.toISOString().length-5))
+        return date.toISOString().substring(0, date.toISOString().length-5)
+        /*return getFormattedDate(date).toISOString().substring(0,10) + " " +
+            getFormattedDate(date).toISOString().substring(11,19);*/
     }
 
     function getFormattedDate(date) {
