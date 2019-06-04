@@ -4,16 +4,16 @@ module.exports = function(mongodb) {
     var go = true;
 
     let countJob = new cron.CronJob({
-        cronTime : '*/300 * * * * *',  // The time pattern when you want the job to start
+        cronTime : '0 0 */1 * * *',  // The time pattern when you want the job to start
         onTick : dbTransfer, // Task to run
         start : true, // immediately starts the job.
     });
 
     async function dbTransfer(){
-        //console.log("running task")
+        console.log("running task " + new Date())
        
         try{
-            let i = 0;
+            //let i = 0;
             var date = new Date();
             
             
@@ -26,15 +26,15 @@ module.exports = function(mongodb) {
             var currentDate = getFormattedDate(date)
             var oneHourBackDate = getOneHourBackDate(date);
 
-            //const misurazioni = await mongodb.collection('misurazioni').find( { "timestamp": { $gte: oneHourBackDate, $lt: currentDate } }).toArray();
+            const misurazioni = await mongodb.collection('misurazioni').find( { "timestamp": { $gte: oneHourBackDate, $lt: currentDate } }).toArray();
             //const misurazioni = await mongodb.collection('misurazioni').find().toArray();
-            const misurazioni = [];
+            //const misurazioni = [];
             //console.log(misurazioni.length)
-            if(misurazioni.length != 0 && go) {
-                go=false;
+            if(misurazioni.length != 0) {
+                //go=false;
                 for(let m of misurazioni) {
-                    console.log(i)
-                    i=i+1
+                    //console.log(i)
+                    //i=i+1
                     var persona = await pool.query('SELECT * FROM persona WHERE persona.email=?', m.userID);
 
                     /************** PERSONA ***************/
