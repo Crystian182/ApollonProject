@@ -1,13 +1,15 @@
 module.exports = function(mongodb) {
     let cron = require('cron');
     var pool = require('../../config/mysqldb');
-    var go = true;
+    var checkpoint = true;
 
     let countJob = new cron.CronJob({
         cronTime : '0 0 */1 * * *',  // The time pattern when you want the job to start
         onTick : dbTransfer, // Task to run
         start : true, // immediately starts the job.
     });
+
+    //cronTime : '0 */3 * * * *',
 
     async function dbTransfer(){
         console.log("running task " + new Date())
@@ -30,8 +32,8 @@ module.exports = function(mongodb) {
             //const misurazioni = await mongodb.collection('misurazioni').find().toArray();
             //const misurazioni = [];
             //console.log(misurazioni.length)
-            if(misurazioni.length != 0) {
-                //go=false;
+            if(misurazioni.length != 0 && checkpoint) {
+                checkpoint=false;
                 for(let m of misurazioni) {
                     //console.log(i)
                     //i=i+1
@@ -172,6 +174,7 @@ module.exports = function(mongodb) {
 
                 }
             }
+            checkpoint = true;
         } catch (err){
             console.log(err)
         }
