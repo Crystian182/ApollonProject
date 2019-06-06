@@ -1,0 +1,15 @@
+INSTALLAZIONI
+1. Installare node (v10.15.3):
+    https://nodejs.org/it/download/
+2. Installare mongo (v.4.0.6)
+    https://docs.mongodb.com/manual/administration/install-community/
+3. Installare MySql v5.7
+    https://dev.mysql.com/doc/mysql-installation-excerpt/5.7/en/
+    
+CONFIGURAZIONI DATABASE
+1. Creare il database 'apollonproject' in mongo
+2. Creare il database 'apollonprojectdb' in MySQL utilizzando il file apollonprojectdb.sql
+
+AVVIO SERVER
+Posizionarsi da terminale nella cartella root di progetto e avviare il server:
+    npm start
